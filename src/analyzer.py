@@ -10,6 +10,15 @@ sol = Solver()
 a, b, c, d, e, f, g = Ints('a b c d e f g')
 
 
+def getCondElement(cond):
+  element = ''
+  try:
+    element = cond.name
+  except:
+    element = cond.value
+  return element
+
+
 def exploreAST(ast):
   if ast == None:
     return
@@ -21,10 +30,12 @@ def exploreAST(ast):
         PROBLEM_LIST.append([tmp, funcname, ast.name.coord])
 
   elif type(ast) == c_ast.If:
-    stack.append(eval(ast.cond.left.name + ast.cond.op + ast.cond.right.value))
+    left = getCondElement(ast.cond.left)
+    right = getCondElement(ast.cond.right)
+    stack.append(eval(left + ast.cond.op + right))
     exploreAST(ast.iftrue)
     stack.pop()
-    stack.append(Not(eval(ast.cond.left.name + ast.cond.op + ast.cond.right.value)))
+    stack.append(Not(eval(left + ast.cond.op + right)))
     exploreAST(ast.iffalse)
     stack.pop()
 
@@ -39,10 +50,12 @@ def exploreAST(ast):
             tmp = stack[:]
             PROBLEM_LIST.append([tmp, funcname, ast.name.coord])
       elif type(block) == c_ast.If:
-        stack.append(eval(block.cond.left.name + block.cond.op + block.cond.right.value))
+        left = getCondElement(block.cond.left)
+        right = getCondElement(block.cond.right)
+        stack.append(eval(left + block.cond.op + right))
         exploreAST(block.iftrue)
         stack.pop()
-        stack.append(Not(eval(block.cond.left.name + block.cond.op + block.cond.right.value)))
+        stack.append(Not(eval(left + block.cond.op + right)))
         exploreAST(block.iffalse)
         stack.pop()
       elif type(block) == c_ast.Decl:
@@ -69,4 +82,3 @@ def run():
     else:
       print(str(sol.check()), problemList[0], problemList[1], problemList[2])
     sol.reset()
-  
