@@ -1,13 +1,22 @@
 int main() {
-  int a=1;
-  if(a==1){
-    if(a==2)
-      sprintf();
+  int a;
+  char buffer[5], str[5];
+  scanf_s("%d", &a);
+
+  if (a == 1) {
+    if (a == 2) {
+      gets(buffer);
+    }
+    else {
+      gets(buffer);
+      strcpy(str, buffer);
+    }
   }
-  else
-    sprintf();
-  for(a=1;a<10;a++){
-    printf('1');
+  else {
+    if (a == 1) {
+      strcat(buffer, str);
+    }
   }
+  
   return 0;  
 }
