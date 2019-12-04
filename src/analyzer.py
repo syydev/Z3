@@ -23,6 +23,23 @@ def exploreAST(ast):
   if ast == None:
     return
 
+  elif type(ast) == c_ast.Decl:
+    # TODO implement dynamic declaration and init
+    if ast.init:
+      # exec(ast.name + '= Int(\'' + ast.name + '\')')
+      # exec(ast.name + '=' + ast.init.value)
+      # print(ast.name + '=' + ast.init.value)
+      return
+    else:
+      # exec(ast.name + '= Int(\'' + ast.name + '\')')
+      return
+
+  elif type(ast) == c_ast.Assignment:
+    # TODO implement dynamic assignment
+    # exec(ast.lvalue.name + ast.op + ast.rvalue.value)
+    # print(ast.lvalue.name + ast.op + ast.rvalue.value)
+    return
+
   elif type(ast) == c_ast.FuncCall:
     for funcname in WEAK_FUNCTION:
       if funcname == ast.name.name:
@@ -39,30 +56,16 @@ def exploreAST(ast):
     exploreAST(ast.iffalse)
     stack.pop()
 
-  elif type(ast) == c_ast.Decl:
-    print(ast)
+  elif type(ast) == c_ast.For or type(ast) == c_ast.While or type(ast) == c_ast.DoWhile:
+    # TODO implement explore For, While, DoWhile
+    return
+
+  elif type(ast) == c_ast.Return:
+    return
 
   elif ast.block_items:
     for block in ast.block_items:
-      if type(block) == c_ast.FuncCall:
-        for funcname in WEAK_FUNCTION:
-          if funcname == block.name.name:
-            tmp = stack[:]
-            PROBLEM_LIST.append([tmp, funcname, ast.name.coord])
-      elif type(block) == c_ast.If:
-        left = getCondElement(block.cond.left)
-        right = getCondElement(block.cond.right)
-        stack.append(eval(left + block.cond.op + right))
-        exploreAST(block.iftrue)
-        stack.pop()
-        stack.append(Not(eval(left + block.cond.op + right)))
-        exploreAST(block.iffalse)
-        stack.pop()
-      elif type(block) == c_ast.Decl:
-        if block.init:
-          print(block.type.type.names[0], block.name, block.init.value)
-        else:
-          print(block.type.type.names[0], block.name)
+      exploreAST(block)
 
 
 def run():
@@ -78,7 +81,7 @@ def run():
     for problem in problemList[0]:
       sol.add(problem)
     if str(sol.check()) == 'sat':
-      print(str(sol.check()), problemList[0], problemList[1], problemList[2], sol.model())
+      print('[Critical vulnerability] %s called in %s' % (problemList[1], problemList[2]))
     else:
-      print(str(sol.check()), problemList[0], problemList[1], problemList[2])
+      print('[Potential vulnerability] %s used in %s' % (problemList[1], problemList[2]))
     sol.reset()
